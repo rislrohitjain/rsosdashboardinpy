@@ -1,0 +1,7 @@
+polars==1.0.0
+adbc-driver-mysql
+adbc-driver-manager
+python-dotenv
+flask
+xlsxwriter
+plotly
