@@ -7,89 +7,147 @@
     
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
     
     <style>
-        :root { --glass: rgba(22, 27, 34, 0.9); --accent: #58a6ff; --success-glow: rgba(35, 134, 54, 0.3); }
-        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        :root { 
+            --bg-main: #0a0e14;
+            --bg-card: rgba(21, 28, 38, 0.7);
+            --border-color: #263142;
+            --accent-blue: #00f0ff;
+            --accent-cyan: #0df;
+            --accent-green: #00ff88;
+            --accent-amber: #ffaa00;
+            --accent-purple: #b624ff;
+        }
+
+        body { 
+            background-color: var(--bg-main); 
+            color: #e1e7ef; 
+            font-family: 'Inter', system-ui, sans-serif; 
+            overflow-x: hidden; 
+        }
         
         #loader-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0d1117; z-index: 9999; display: flex; flex-direction: column;
+            background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column;
             align-items: center; justify-content: center; transition: opacity 0.6s ease;
         }
         .spinner-outer {
-            width: 80px; height: 80px; border: 4px solid rgba(88, 166, 255, 0.1);
-            border-top: 4px solid var(--accent); border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.6, -0.28, 0.735, 0.045) infinite;
+            width: 70px; height: 70px; border: 4px solid rgba(0, 240, 255, 0.1);
+            border-top: 4px solid var(--accent-blue); border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .dashboard-container { background: #161b22; border: 1px solid #30363d; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .kpi-card { background: var(--glass); border: 1px solid #30363d; border-radius: 12px; padding: 20px; transition: transform 0.3s ease; }
-        .kpi-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .nav-tabs .nav-link { color: #8b949e; border: none; padding: 1rem 1.5rem; font-weight: 500; }
-        .nav-tabs .nav-link.active { color: var(--accent); background: transparent; border-bottom: 3px solid var(--accent); }
-        .chart-frame { min-height: 400px; padding: 10px; margin-bottom: 20px; }
+        .dashboard-container { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 20px; 
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+        }
+
+        .kpi-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            padding: 24px 20px; 
+            backdrop-filter: blur(8px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .kpi-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--accent-blue); 
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Customizable tab styling matching the vibrant glass theme */
+        .nav-tabs { border-bottom: 1px solid var(--border-color); }
+        .nav-tabs .nav-link { color: #8fa0b5; border: none; padding: 0.8rem 1.2rem; font-weight: 500; font-size: 0.95rem; }
+        .nav-tabs .nav-link.active { 
+            color: var(--accent-blue); 
+            background: transparent; 
+            border-bottom: 3px solid var(--accent-blue); 
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
         
-        footer { background: #161b22; border-top: 1px solid #30363d; padding: 25px 0; margin-top: 40px; }
-        .signature-link { color: var(--accent); text-decoration: none; font-weight: 600; transition: 0.3s; }
-        .signature-link:hover { opacity: 0.8; text-shadow: 0 0 8px var(--accent); }
-        .perf-tag { font-size: 0.75rem; color: #8b949e; border-right: 1px solid #30363d; padding: 0 15px; }
+        .chart-frame { min-height: 380px; padding: 10px; margin-bottom: 15px; width: 100%; }
+        
+        footer { background: #0e141f; border-top: 1px solid var(--border-color); padding: 25px 0; margin-top: 40px; }
+        .signature-link { color: var(--accent-blue); text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .signature-link:hover { opacity: 0.8; text-shadow: 0 0 10px var(--accent-blue); }
+        .perf-tag { font-size: 0.8rem; color: #8fa0b5; border-right: 1px solid var(--border-color); padding: 0 15px; }
+        .perf-tag:last-child { border-right: none; }
+
+        /* Media queries to optimize UI fields on smaller systems */
+        @media (max-width: 576px) {
+            .nav-tabs .nav-link { padding: 0.6rem 0.8rem; font-size: 0.85rem; }
+            .action-bar { width: 100% !important; }
+            .chart-frame { min-height: 300px; }
+        }
     </style>
 </head>
 <body onload="initDashboard()">
 
 <div id="loader-wrapper">
     <div class="spinner-outer"></div>
-    <div class="mt-4 text-primary fw-light tracking-widest uppercase" style="letter-spacing: 4px;">Synchronizing Analytics Engine...</div>
+    <div class="mt-4 text-info fw-light tracking-widest uppercase" style="letter-spacing: 4px; font-size: 0.9rem;">Synchronizing Analytics Engine...</div>
 </div>
 
-<div class="container-fluid py-4 px-md-5">
-    <div class="d-md-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1 text-white">Analytics <span class="text-info">Command Center</span></h1>
+<div class="container-fluid py-4 px-3 px-md-5">
+    <!-- Responsive Header Layout -->
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-12 col-md-6 col-lg-7 text-center text-md-start">
+            <h1 class="fw-bold mb-1 text-white h2">Analytics <span style="color: var(--accent-cyan); text-shadow: 0 0 15px rgba(0,221,255,0.2);">Command Center</span></h1>
             <p class="text-secondary small mb-0">Rajasthan State Open School | On-Demand Examination Cycle 2026</p>
         </div>
-        <div class="mt-3 mt-md-0 d-flex gap-2">
-            <input type="text" id="tableSearch" class="form-control form-control-sm bg-dark border-secondary text-white" placeholder="Search records..." onkeyup="filterTable()" style="width: 250px;">
-            <button class="btn btn-outline-info btn-sm rounded-pill px-3" onclick="loadDashboard()">🔄 Refresh</button>
-			
-			<a href="/dashboard2" class="btn btn-info btn-sm rounded-pill px-3">🚀 Executive View</a>
+        <div class="col-12 col-md-6 col-lg-5">
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-md-end align-items-stretch align-items-sm-center">
+                <input type="text" id="tableSearch" class="form-control form-control-sm bg-dark border-secondary text-white py-2 px-3 action-bar" placeholder="Search records..." onkeyup="filterTable()" style="max-width: 100%; min-width: 200px;">
+                <div class="d-flex gap-2 justify-content-between">
+                    <button class="btn btn-outline-info btn-sm rounded-pill px-3 flex-grow-1" onclick="loadDashboard()">🔄 Refresh</button>
+                    <a href="/dashboard2" class="btn btn-info btn-sm rounded-pill px-3 text-dark fw-semibold flex-grow-1" style="background-color: var(--accent-cyan);">🚀 Executive View</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Enhanced KPI Row -->
+    <!-- Enhanced High-Contrast Responsive KPI Row -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-card text-center">
-                <div class="text-secondary small text-uppercase">Total Applications</div>
-                <div id="kpi-total" class="h2 fw-bold text-info mb-0">0</div>
+                <div class="text-secondary small text-uppercase fw-semibold tracking-wider mb-1">Total Applications</div>
+                <div id="kpi-total" class="h1 fw-bold mb-0" style="color: var(--accent-blue); text-shadow: 0 0 10px rgba(0,240,255,0.2);">0</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-card text-center">
-                <div class="text-secondary small text-uppercase">Gross Revenue</div>
-                <div id="kpi-fees" class="h2 fw-bold text-success mb-0">₹0</div>
+                <div class="text-secondary small text-uppercase fw-semibold tracking-wider mb-1">Gross Revenue</div>
+                <div id="kpi-fees" class="h1 fw-bold mb-0" style="color: var(--accent-green); text-shadow: 0 0 10px rgba(0,255,136,0.2);">₹0</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-card text-center">
-                <div class="text-secondary small text-uppercase">Verification Pipeline</div>
-                <div id="kpi-pending" class="h2 fw-bold text-warning mb-0">0</div>
+                <div class="text-secondary small text-uppercase fw-semibold tracking-wider mb-1">Verification Pipeline</div>
+                <div id="kpi-pending" class="h1 fw-bold mb-0" style="color: var(--accent-amber); text-shadow: 0 0 10px rgba(255,170,0,0.2);">0</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-card text-center">
-                <div class="text-secondary small text-uppercase">Active Districts</div>
-                <div id="kpi-districts" class="h2 fw-bold text-primary mb-0">0</div>
+                <div class="text-secondary small text-uppercase fw-semibold tracking-wider mb-1">Active Districts</div>
+                <div id="kpi-districts" class="h1 fw-bold mb-0" style="color: var(--accent-purple); text-shadow: 0 0 10px rgba(182,36,255,0.2);">0</div>
             </div>
         </div>
     </div>
 
-    <div class="dashboard-container p-4">
-        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+    <!-- Tabbed Dashboard Workspace Container -->
+    <div class="dashboard-container p-3 p-md-4">
+        <ul class="nav nav-tabs mb-4 flex-nowrap overflow-x-auto text-nowrap" id="dashboardTabs" role="tablist">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview" type="button">📊 Overview</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#demographics" type="button">👥 Demographics</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#academics" type="button">📚 Academics</button></li>
@@ -99,41 +157,41 @@
         <div class="tab-content">
             <!-- Tab 1: Overview -->
             <div class="tab-pane fade show active" id="overview">
-                <div class="row">
-                    <div class="col-md-7"><div id="districtChart" class="chart-frame"></div></div>
-                    <div class="col-md-5"><div id="categoryChart" class="chart-frame"></div></div>
+                <div class="row g-4">
+                    <div class="col-12 col-xl-7"><div id="districtChart" class="chart-frame"></div></div>
+                    <div class="col-12 col-xl-5"><div id="categoryChart" class="chart-frame"></div></div>
                 </div>
             </div>
             
             <!-- Tab 2: Demographics -->
             <div class="tab-pane fade" id="demographics">
-                <div class="row">
-                    <div class="col-md-4"><div id="genderChart" class="chart-frame"></div></div>
-                    <div class="col-md-4"><div id="employmentChart" class="chart-frame"></div></div>
-                    <div class="col-md-4"><div id="religionChart" class="chart-frame"></div></div>
+                <div class="row g-4">
+                    <div class="col-12 col-md-6 col-xl-4"><div id="genderChart" class="chart-frame"></div></div>
+                    <div class="col-12 col-md-6 col-xl-4"><div id="employmentChart" class="chart-frame"></div></div>
+                    <div class="col-12 col-xl-4"><div id="religionChart" class="chart-frame"></div></div>
                 </div>
             </div>
 
             <!-- Tab 3: Academics -->
             <div class="tab-pane fade" id="academics">
-                <div class="row">
-                    <div class="col-md-6"><div id="subjectChart" class="chart-frame"></div></div>
-                    <div class="col-md-6"><div id="mediumChart" class="chart-frame"></div></div>
+                <div class="row g-4">
+                    <div class="col-12 col-md-6"><div id="subjectChart" class="chart-frame"></div></div>
+                    <div class="col-12 col-md-6"><div id="mediumChart" class="chart-frame"></div></div>
                 </div>
             </div>
 
-            <!-- Tab 4: Table -->
+            <!-- Tab 4: Table Ledger -->
             <div class="tab-pane fade" id="table">
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <div class="table-responsive border border-secondary rounded-3" style="max-height: 600px; overflow-y: auto;">
                     <table class="table table-dark table-hover align-middle mb-0" id="mainDataTable">
-                        <thead class="sticky-top bg-dark">
+                        <thead class="sticky-top bg-dark border-bottom border-secondary">
                             <tr>
-                                <th>Enrollment</th>
-                                <th>Student Name</th>
-                                <th>District</th>
-                                <th>Subject</th>
-                                <th>Fee</th>
-                                <th>Status</th>
+                                <th class="py-3 px-3">Enrollment</th>
+                                <th class="py-3">Student Name</th>
+                                <th class="py-3">District</th>
+                                <th class="py-3">Subject</th>
+                                <th class="py-3">Fee</th>
+                                <th class="py-3 px-3">Status</th>
                             </tr>
                         </thead>
                         <tbody id="studentTableBody"></tbody>
@@ -145,14 +203,14 @@
 </div>
 
 <footer>
-    <div class="container-fluid px-5">
-        <div class="row align-items-center">
-            <div class="col-md-8 d-flex flex-wrap justify-content-center justify-content-md-start">
-                <div class="perf-tag">Engine: <strong>Polars/JS</strong></div>
-                <div class="perf-tag">Status: <strong class="text-success">Live</strong></div>
-                <div class="perf-tag">Latency: <strong id="perf-time" class="text-info">0ms</strong></div>
+    <div class="container-fluid px-4 px-md-5">
+        <div class="row align-items-center g-3">
+            <div class="col-12 col-md-8 d-flex flex-wrap justify-content-center justify-content-md-start">
+                <div class="perf-tag">Engine: <strong style="color: #fff">Polars/JS</strong></div>
+                <div class="perf-tag">Status: <strong style="color: var(--accent-green)">Live</strong></div>
+                <div class="perf-tag">Latency: <strong id="perf-time" style="color: var(--accent-cyan)">0ms</strong></div>
             </div>
-            <div class="col-lg-4 text-center text-lg-end mt-3 mt-lg-0">
+            <div class="col-12 col-md-4 text-center text-md-end">
                 <a href="#" class="signature-link">RSOS Intelligence Portal 2026</a>
             </div>
         </div>
@@ -163,18 +221,27 @@
     const startTime = performance.now();
     const getVal = (obj, key) => obj[key] ?? "Not Specified";
 
+    // Track chart instances globally to manipulate their dimensions on window adjustments
+    const renderedCharts = [];
+
     async function initDashboard() {
         await loadDashboard();
         setTimeout(() => {
             document.getElementById('loader-wrapper').style.opacity = '0';
             setTimeout(() => document.getElementById('loader-wrapper').style.display = 'none', 600);
         }, 800);
+        
+        // Dynamic handler ensuring Plotly charts match layout resizing steps automatically
+        window.addEventListener('resize', () => {
+            renderedCharts.forEach(id => {
+                const element = document.getElementById(id);
+                if(element) Plotly.Plots.resize(element);
+            });
+        });
     }
 
     async function loadDashboard() {
         try {
-            // Mocking the data from your provided snippet for the demo, 
-            // In production, fetch from /api/data?limit=2000
             const response = await fetch('/api/data?limit=20000');
             const data = await response.json();
             
@@ -185,14 +252,17 @@
             document.getElementById('perf-time').innerText = Math.round(performance.now() - startTime) + "ms";
         } catch (error) {
             console.error("Data Fetch Error:", error);
+            // Fallback empty array structures to keep systems operational during mock failure
+            updateKPIs([]);
+            renderCharts([]);
         }
     }
 
     function updateKPIs(data) {
-        document.getElementById('kpi-total').innerText = data.length;
+        document.getElementById('kpi-total').innerText = data.length.toLocaleString();
         const totalFees = data.reduce((s, r) => s + parseFloat(getVal(r, 'fee_paid_amount') || 0), 0);
         document.getElementById('kpi-fees').innerText = "₹" + totalFees.toLocaleString();
-        document.getElementById('kpi-pending').innerText = data.filter(d => getVal(d, 'verifier_status_label') === 'Pending').length;
+        document.getElementById('kpi-pending').innerText = data.filter(d => getVal(d, 'verifier_status_label') === 'Pending').length.toLocaleString();
         document.getElementById('kpi-districts').innerText = [...new Set(data.map(d => getVal(d, 'district_name')))].length;
     }
 
@@ -208,74 +278,78 @@
         const commonLayout = {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
-            font: { color: '#8b949e', size: 11 },
-            margin: { t: 40, b: 40, l: 40, r: 20 },
-            showlegend: false
+            font: { color: '#8fa0b5', size: 11, family: 'Inter, sans-serif' },
+            margin: { t: 50, b: 40, l: 50, r: 20 },
+            showlegend: false,
+            responsive: true
         };
 
-        const colors = ['#58a6ff', '#3fb950', '#d29922', '#f85149', '#bc8cff', '#79c0ff'];
+        const colors = ['#00f0ff', '#00ff88', '#ffaa00', '#b624ff', '#ff5757', '#0df'];
 
         // 1. Geographic Distribution
         const distData = countOccurrences(data, 'district_name');
         Plotly.newPlot('districtChart', [{
             x: Object.keys(distData), y: Object.values(distData),
-            type: 'bar', marker: { color: colors[0] }
-        }], { ...commonLayout, title: 'Student Volume by District' });
+            type: 'bar', marker: { color: '#00f0ff', line: {color: '#00f0ff', width: 1.5} }
+        }], { ...commonLayout, title: { text: 'Student Volume by District', font: {color: '#fff', size: 14, weight: 600}} });
 
         // 2. Category Breakdown
         const catData = countOccurrences(data, 'category_label');
         Plotly.newPlot('categoryChart', [{
             labels: Object.keys(catData), values: Object.values(catData),
-            type: 'pie', hole: 0.6, marker: { colors: colors }
-        }], { ...commonLayout, title: 'Social Category Distribution', showlegend: true });
+            type: 'pie', hole: 0.5, marker: { colors: colors }
+        }], { ...commonLayout, title: { text: 'Social Category Distribution', font: {color: '#fff', size: 14}}, showlegend: true, legend: {font: {color: '#8fa0b5'}} });
 
         // 3. Gender Distribution
         const genData = countOccurrences(data, 'gender_label');
         Plotly.newPlot('genderChart', [{
             labels: Object.keys(genData), values: Object.values(genData),
-            type: 'pie', marker: { colors: ['#58a6ff', '#ff7b72'] }
-        }], { ...commonLayout, title: 'Gender Ratio' });
+            type: 'pie', hole: 0.4, marker: { colors: ['#00f0ff', '#ff5757'] }
+        }], { ...commonLayout, title: { text: 'Gender Ratio', font: {color: '#fff', size: 14}} });
 
         // 4. Employment Status
         const empData = countOccurrences(data, 'employment_status_label');
         Plotly.newPlot('employmentChart', [{
             x: Object.keys(empData), y: Object.values(empData),
-            type: 'bar', marker: { color: colors[1] }
-        }], { ...commonLayout, title: 'Employment Profile' });
+            type: 'bar', marker: { color: '#00ff88' }
+        }], { ...commonLayout, title: { text: 'Employment Profile', font: {color: '#fff', size: 14}} });
 
         // 5. Subject Popularity
         const subData = countOccurrences(data, 'subject_name');
         Plotly.newPlot('subjectChart', [{
             y: Object.keys(subData), x: Object.values(subData),
-            type: 'bar', orientation: 'h', marker: { color: colors[4] }
-        }], { ...commonLayout, title: 'Subject Enrollment (Top Subjects)', margin: { l: 150 } });
+            type: 'bar', orientation: 'h', marker: { color: '#b624ff' }
+        }], { ...commonLayout, title: { text: 'Subject Enrollment', font: {color: '#fff', size: 14}}, margin: { l: 120, t: 50, b: 40, r: 20 } });
 
         // 6. Medium Distribution
         const medData = countOccurrences(data, 'medium_label');
         Plotly.newPlot('mediumChart', [{
             labels: Object.keys(medData), values: Object.values(medData),
-            type: 'pie', hole: 0.4, marker: { colors: ['#d29922', '#3fb950'] }
-        }], { ...commonLayout, title: 'Instruction Medium', showlegend: true });
+            type: 'pie', hole: 0.4, marker: { colors: ['#ffaa00', '#0df'] }
+        }], { ...commonLayout, title: { text: 'Instruction Medium', font: {color: '#fff', size: 14}}, showlegend: true });
 
         // 7. Religion Insights
         const relData = countOccurrences(data, 'religion_label');
         Plotly.newPlot('religionChart', [{
             labels: Object.keys(relData), values: Object.values(relData),
             type: 'pie', marker: { colors: colors }
-        }], { ...commonLayout, title: 'Religious Diversity' });
+        }], { ...commonLayout, title: { text: 'Religious Diversity', font: {color: '#fff', size: 14}} });
+
+        // Push layout targets to tracking logic pipeline references
+        renderedCharts.push('districtChart', 'categoryChart', 'genderChart', 'employmentChart', 'subjectChart', 'mediumChart', 'religionChart');
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('studentTableBody');
         tbody.innerHTML = data.map(row => `
             <tr>
-                <td class="font-monospace text-info small">${getVal(row, 'enrollment')}</td>
-                <td class="fw-bold">${getVal(row, 'student_name')}</td>
-                <td><span class="badge bg-dark border border-secondary">${getVal(row, 'district_name')}</span></td>
-                <td class="small">${getVal(row, 'subject_name')}</td>
-                <td class="text-success fw-bold">₹${getVal(row, 'fee_paid_amount')}</td>
-                <td>
-                    <span class="badge ${getVal(row, 'verifier_status_label') === 'Pending' ? 'bg-warning text-dark' : 'bg-success'}">
+                <td class="font-monospace text-info small px-3">${getVal(row, 'enrollment')}</td>
+                <td class="fw-semibold text-white">${getVal(row, 'student_name')}</td>
+                <td><span class="badge bg-dark border border-secondary text-secondary-emphasis">${getVal(row, 'district_name')}</span></td>
+                <td class="small text-secondary">${getVal(row, 'subject_name')}</td>
+                <td class="fw-bold" style="color: var(--accent-green)">₹${parseFloat(getVal(row, 'fee_paid_amount')).toLocaleString()}</td>
+                <td class="px-3">
+                    <span class="badge ${getVal(row, 'verifier_status_label') === 'Pending' ? 'bg-warning-subtle text-warning border border-warning' : 'bg-success-subtle text-success border border-success'} px-2 py-1.5 rounded">
                         ${getVal(row, 'verifier_status_label')}
                     </span>
                 </td>
@@ -293,5 +367,36 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Execution Time Container -->
+<div class="timing-panel" style="background: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; font-family: monospace;">
+    <h4 style="margin-top: 0;">⏱️ Page Performance Breakdowns</h4>
+    <ul>
+        <!-- 1. Displays the time passed from Flask -->
+        <li><strong>Step 1 (Backend Render):</strong> Server prepared this view in <span style="color: #d63384;">{{ backend_time }} seconds</span></li>
+        
+        <!-- 2. Displays the time calculated by the browser -->
+        <li><strong>Step 2 (Browser Load):</strong> Client network & paint took <span id="frontend-time" style="color: #28a745;">Calculating...</span></li>
+    </ul>
+</div>
+
+<!-- Script to calculate browser execution performance step -->
+<script>
+    window.addEventListener('load', () => {
+        // Use the modern Performance Navigation Timing API
+        const [navigation] = performance.getEntriesByType('navigation');
+        if (navigation) {
+            // Calculate total time from request start to complete load
+            const loadTimeDOM = (navigation.loadEventEnd - navigation.requestStart) / 1000;
+            document.getElementById('frontend-time').innerText = `${loadTimeDOM.toFixed(4)} seconds`;
+        } else {
+            // Fallback for older configurations
+            const loadTimeLegacy = (performance.now()) / 1000;
+            document.getElementById('frontend-time').innerText = `${loadTimeLegacy.toFixed(4)} seconds`;
+        }
+    });
+</script>
+
+
 </body>
 </html>

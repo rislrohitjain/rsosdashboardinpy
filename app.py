@@ -1,8 +1,10 @@
 from flask import Flask, render_template, jsonify, request
+import time  # 1. Import the time module
 from data_service import get_student_data
 from data_service import get_student_data_excel
 from make_sample_data_excel import generate_synthetic_data
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,13 +12,32 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('dashboard1.html')
+    start_time = time.perf_counter()
+    
+    # Step 1: Simulated dashboard processing/auth check/data prep
+    # (If you do any heavy loading for dashboard1, it happens here)
+    time.sleep(0.05) # Simulated brief delay
+    
+    end_time = time.perf_counter()
+    execution_time = round(end_time - start_time, 4)
+    
+    # Pass the time variable into the template
+    return render_template('dashboard1.html', backend_time=execution_time)
+
 
 @app.route('/dashboard2')
 def dashboard2():
-    # This renders the specialized analytical view
-    return render_template('dashboard2.html')
-
+    start_time = time.perf_counter()
+    
+    # Step 1: Analytical view heavy preparation logic
+    # (If dashboard 2 processes data before showing the HTML)
+    time.sleep(0.12) # Simulated brief delay
+    
+    end_time = time.perf_counter()
+    execution_time = round(end_time - start_time, 4)
+    
+    # Pass the time variable into the template
+    return render_template('dashboard2.html', backend_time=execution_time)
   
 @app.route('/api/data')
 def api_data():

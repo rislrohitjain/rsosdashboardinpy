@@ -8,3 +8,9 @@ PyMySQL>=1.1.0
 cryptography>=42.0.0
 python-dotenv>=1.0.0
 gunicorn
+
+# --- ADDED MISSING DEPENDENCIES ---
+psutil                # Required for CPU/Memory performance tracking
+connectorx>=0.3.2     # Required for high-speed SQL loading into Polars
+openpyxl              # Fallback engine for Polars Excel handling
+gevent                # Optional but recommended async worker for Gunicorn

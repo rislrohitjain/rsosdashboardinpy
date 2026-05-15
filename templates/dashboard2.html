@@ -5,120 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSOS Intelligence | Executive Dashboard</title>
     
+    <!-- Bootstrap 5.3 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
     
     <style>
-        :root { --sidebar-width: 260px; --glass-bg: rgba(22, 27, 34, 0.95); --accent: #58a6ff; }
-        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Inter', sans-serif; }
+        :root { 
+            --sidebar-width: 270px; 
+            --bg-main: #060913;
+            --bg-card: rgba(16, 22, 37, 0.75); 
+            --border-glow: #1f2c4d;
+            --accent-blue: #00f0ff;
+            --accent-green: #00ff88;
+            --accent-purple: #cc66ff;
+            --accent-danger: #ff4560;
+        }
         
-        /* Sidebar Navigation */
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0; background: #161b22; border-right: 1px solid #30363d; padding: 1.5rem; z-index: 1000; }
-        .main-content { margin-left: var(--sidebar-width); padding: 2rem; }
+        body { 
+            background-color: var(--bg-main); 
+            color: #d1dbec; 
+            font-family: 'Inter', system-ui, sans-serif; 
+            overflow-x: hidden;
+        }
         
-        .nav-pills .nav-link { color: #8b949e; margin-bottom: 0.5rem; padding: 0.8rem 1rem; border-radius: 10px; transition: 0.2s; border: 1px solid transparent; }
-        .nav-pills .nav-link:hover { background: #21262d; }
-        .nav-pills .nav-link.active { background: rgba(88, 166, 255, 0.1); color: var(--accent); border-color: var(--accent); }
-        .nav-pills .nav-link i { margin-right: 10px; }
+        /* Sidebar Navigation Layout */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            height: 100vh; 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            background: rgba(11, 16, 28, 0.95); 
+            border-right: 1px solid var(--border-glow); 
+            padding: 1.75rem 1.5rem; 
+            z-index: 1000; 
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-content { 
+            margin-left: var(--sidebar-width); 
+            padding: 2.5rem; 
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+        
+        /* Custom Tab Styling */
+        .nav-pills .nav-link { 
+            color: #8fa2bf; 
+            margin-bottom: 0.6rem; 
+            padding: 0.85rem 1.2rem; 
+            border-radius: 12px; 
+            transition: all 0.2s ease; 
+            border: 1px solid transparent; 
+            font-weight: 500;
+        }
+        .nav-pills .nav-link:hover { 
+            background: rgba(255, 255, 255, 0.04); 
+            color: #fff;
+        }
+        .nav-pills .nav-link.active { 
+            background: rgba(0, 240, 255, 0.08); 
+            color: var(--accent-blue); 
+            border-color: rgba(0, 240, 255, 0.3); 
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        .nav-pills .nav-link i { margin-right: 12px; font-size: 1.1rem; }
 
-        /* Module Cards */
-        .analytics-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; height: 100%; transition: transform 0.2s; }
-        .chart-frame { min-height: 380px; width: 100%; }
+        /* Premium Adaptive Glass Cards */
+        .analytics-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-glow); 
+            border-radius: 16px; 
+            padding: 1.5rem; 
+            height: 100%; 
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .analytics-card h6 {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1.25rem;
+        }
         
-        /* KPI Pulse */
-        .kpi-box { background: linear-gradient(145deg, #1c2128, #161b22); border: 1px solid #30363d; border-radius: 12px; padding: 1.25rem; }
-        .kpi-value { font-size: 1.8rem; font-weight: 800; color: #f0f6fc; }
-        .kpi-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+        /* Dynamic Chart Frames to prevent size overflow */
+        .chart-frame { 
+            height: 380px; 
+            width: 100%; 
+            position: relative;
+        }
+        
+        /* KPI System Grid */
+        .kpi-box { 
+            background: linear-gradient(135deg, rgba(19,27,48,0.7) 0%, rgba(13,18,32,0.8) 100%); 
+            border: 1px solid var(--border-glow); 
+            border-radius: 16px; 
+            padding: 1.5rem 1.25rem; 
+        }
+        .kpi-value { font-size: 2rem; font-weight: 800; color: #fff; }
+        .kpi-label { font-size: 0.75rem; color: #8fa2bf; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 0.5rem; }
 
-        .status-badge { padding: 0.4em 0.8em; border-radius: 20px; font-size: 0.85rem; }
+        .status-badge { padding: 0.45em 0.9em; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+
+        /* ── ULTIMATE RESPONSIVE RECONCILIATION BREAKPOINTS ── */
+        @media (max-width: 1199.98px) {
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                position: relative; 
+                border-right: none; 
+                border-bottom: 1px solid var(--border-glow);
+                padding: 1.25rem;
+            }
+            .sidebar .mt-auto { display: none !important; }
+            .sidebar .nav { flex-direction: row !important; overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; }
+            .sidebar .nav-link { margin-bottom: 0; margin-right: 0.5rem; white-space: nowrap; padding: 0.6rem 1rem; }
+            .main-content { margin-left: 0; width: 100%; padding: 1.5rem; }
+        }
+        
+        @media (max-width: 576px) {
+            .kpi-value { font-size: 1.6rem; }
+            .chart-frame { height: 300px; }
+            .analytics-card { padding: 1rem; }
+        }
     </style>
 </head>
 <body>
 
 <aside class="sidebar">
-    <div class="mb-4 px-2">
-        <h5 class="fw-bold text-white"><i class="bi bi-cpu-fill text-info me-2"></i>RSOS Matrix</h5>
-        <p class="text-secondary small">Session 2026-V2</p>
+    <div class="mb-3 mb-xl-4 px-2 d-flex d-xl-block justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold text-white mb-0 mb-xl-1"><i class="bi bi-cpu-fill text-info me-2"></i>RSOS Matrix</h5>
+            <p class="text-secondary small mb-0">Session 2026-V2</p>
+        </div>
     </div>
     
     <div class="nav flex-column nav-pills" id="v-tabs-tab" role="tablist">
-	
-		<!-- ADD THIS LINK AT THE TOP -->
-    <a href="/" class="nav-link text-info border-info-subtle mb-3">
-        <i class="bi bi-arrow-left-circle"></i> Command Center
-    </a>
-	
-        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#v-overview"><i class="bi bi-grid-1x2"></i> Overview</button>
-        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-finance"><i class="bi bi-currency-rupee"></i> Financials</button>
-        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-academic"><i class="bi bi-book"></i> Academics</button>
-        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-social"><i class="bi bi-people"></i> Societal</button>
-        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-table"><i class="bi bi-database"></i> Master List</button>
+        <a href="/" class="nav-link text-info border-info-subtle mb-0 mb-xl-3 py-2">
+            <i class="bi bi-arrow-left-circle"></i> Command Center
+        </a>
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#v-overview" type="button"><i class="bi bi-grid-1x2"></i> Overview</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-finance" type="button"><i class="bi bi-currency-rupee"></i> Financials</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-academic" type="button"><i class="bi bi-book"></i> Academics</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-social" type="button"><i class="bi bi-people"></i> Societal</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-table" type="button"><i class="bi bi-database"></i> Master List</button>
     </div>
 
-    <div class="mt-auto pt-5 px-2 border-top border-secondary opacity-50">
-        <small>System: 10.68.128.254</small><br>
-        <small>Engine: Polars/Flask</small>
+    <div class="mt-auto pt-4 px-2 border-top border-secondary opacity-50 d-none d-xl-block">
+        <small class="d-block font-monospace text-secondary">IP: 10.68.128.254</small>
+        <small class="d-block font-monospace text-secondary">Engine: Polars/Flask</small>
     </div>
 </aside>
 
 <main class="main-content">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h2 class="fw-bold text-white mb-0">Intelligence Command Center</h2>
-            <nav aria-label="breadcrumb">
+    <div class="row align-items-center g-3 mb-4">
+        <div class="col-12 col-sm-7 text-center text-sm-start">
+            <h2 class="fw-bold text-white mb-1">Intelligence Dashboard</h2>
+            <nav aria-label="breadcrumb" class="d-flex justify-content-center justify-content-sm-start">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
-                    <li class="breadcrumb-item active">Advanced Analytics</li>
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-info">Home</a></li>
+                    <li class="breadcrumb-item active text-secondary">Advanced Analytics</li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()"><i class="bi bi-arrow-clockwise"></i></button>
-            <div class="badge bg-success-subtle text-success border border-success p-2">LIVE DATA FEED</div>
+        <div class="col-12 col-sm-5 text-center text-sm-end">
+            <div class="d-flex gap-2 justify-content-center justify-content-sm-end align-items-center">
+                <button class="btn btn-outline-secondary btn-sm px-3 py-2" onclick="location.reload()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                <div class="badge bg-success-subtle text-success border border-success p-2 rounded-3 tracking-wider small fw-bold">LIVE DATA</div>
+            </div>
         </div>
     </div>
 
-    <!-- Quick Stats Pulse -->
+    <!-- Responsive KPI Row Matrix -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-box">
                 <div class="kpi-label">Active Applications</div>
-                <div id="kpi-apps" class="kpi-value">--</div>
+                <div id="kpi-apps" class="kpi-value" style="color: var(--accent-blue); text-shadow: 0 0 15px rgba(0,240,255,0.15)">--</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-box">
                 <div class="kpi-label">Total Fee Revenue</div>
-                <div id="kpi-revenue" class="kpi-value text-success">--</div>
+                <div id="kpi-revenue" class="kpi-value" style="color: var(--accent-green); text-shadow: 0 0 15px rgba(0,255,136,0.15)">--</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-box">
                 <div class="kpi-label">Audit Rejections</div>
-                <div id="kpi-rejects" class="kpi-value text-danger">--</div>
+                <div id="kpi-rejects" class="kpi-value" style="color: var(--accent-danger); text-shadow: 0 0 15px rgba(255,69,96,0.15)">--</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="kpi-box">
                 <div class="kpi-label">Geographic Range</div>
-                <div id="kpi-geo" class="kpi-value text-info">--</div>
+                <div id="kpi-geo" class="kpi-value" style="color: var(--accent-purple); text-shadow: 0 0 15px rgba(204,102,255,0.15)">--</div>
             </div>
         </div>
     </div>
 
+    <!-- Dynamic Window Workspaces -->
     <div class="tab-content">
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="v-overview">
             <div class="row g-4">
-                <div class="col-md-8">
+                <div class="col-12 col-xl-8">
                     <div class="analytics-card">
                         <h6>District Performance Index</h6>
                         <div id="districtChart" class="chart-frame"></div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-xl-4">
                     <div class="analytics-card">
                         <h6>Gender Distribution</h6>
                         <div id="genderChart" class="chart-frame"></div>
@@ -130,7 +234,7 @@
         <!-- Financials Tab -->
         <div class="tab-pane fade" id="v-finance">
             <div class="row g-4">
-                <div class="col-md-12">
+                <div class="col-12">
                     <div class="analytics-card">
                         <h6>Revenue Pipeline vs Approval Status</h6>
                         <div id="revenueChart" class="chart-frame"></div>
@@ -142,36 +246,42 @@
         <!-- Academics Tab -->
         <div class="tab-pane fade" id="v-academic">
             <div class="row g-4">
-                <div class="col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="analytics-card"><h6>Subject Volume</h6><div id="subjectChart" class="chart-frame"></div></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="analytics-card"><h6>Language Mediums</h6><div id="mediumChart" class="chart-frame"></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- Societal Tab -->
+        <!-- Societal Tab (Religion, Employment, Category) -->
         <div class="tab-pane fade" id="v-social">
             <div class="row g-4">
-                <div class="col-md-4"><div class="analytics-card"><h6>Category</h6><div id="categoryChart" class="chart-frame"></div></div></div>
-                <div class="col-md-4"><div class="analytics-card"><h6>Religion</h6><div id="religionChart" class="chart-frame"></div></div></div>
-                <div class="col-md-4"><div class="analytics-card"><h6>Employment</h6><div id="employmentChart" class="chart-frame"></div></div></div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="analytics-card"><h6>Category</h6><div id="categoryChart" class="chart-frame"></div></div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="analytics-card"><h6>Religion</h6><div id="religionChart" class="chart-frame"></div></div>
+                </div>
+                <div class="col-12 col-xl-4">
+                    <div class="analytics-card"><h6>Employment</h6><div id="employmentChart" class="chart-frame"></div></div>
+                </div>
             </div>
         </div>
 
         <!-- Master Table Tab -->
         <div class="tab-pane fade" id="v-table">
             <div class="analytics-card p-0 overflow-hidden">
-                <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center">
+                <div class="p-3 border-bottom border-secondary d-flex flex-column flex-sm-row gap-3 justify-content-between align-items-sm-center bg-black bg-opacity-20">
                     <h6 class="mb-0">Records Ledger</h6>
-                    <input type="text" id="tableSearch" class="form-control form-control-sm w-25 bg-dark text-white border-secondary" placeholder="Quick Filter..." onkeyup="filterTable()">
+                    <input type="text" id="tableSearch" class="form-control form-control-sm bg-dark text-white border-secondary py-2 px-3" placeholder="Quick Filter..." style="max-width: 100%; min-width: 240px;" onkeyup="filterTable()">
                 </div>
                 <div class="table-responsive" style="max-height: 600px;">
                     <table class="table table-dark table-hover mb-0 align-middle">
-                        <thead class="table-light">
+                        <thead class="table-light border-bottom border-secondary sticky-top">
                             <tr>
-                                <th>ID</th><th>Student Name</th><th>District</th><th>Subject</th><th>Status</th>
+                                <th class="py-3 px-3">ID</th><th class="py-3">Student Name</th><th class="py-3">District</th><th class="py-3">Subject</th><th class="py-3 px-3">Status</th>
                             </tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
@@ -183,19 +293,36 @@
 </main>
 
 <script>
-    const chartConfig = { paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { color: '#8b949e' }, margin: { t: 30, b: 40, l: 40, r: 10 } };
+    const chartConfig = { 
+        paper_bgcolor: 'rgba(0,0,0,0)', 
+        plot_bgcolor: 'rgba(0,0,0,0)', 
+        font: { color: '#8fa2bf', family: 'Inter, sans-serif', size: 11 }, 
+        margin: { t: 20, b: 40, l: 45, r: 15 },
+        responsive: true
+    };
+
+    const palette = ['#00f0ff', '#00ff88', '#cc66ff', '#ffaa00', '#ff4560', '#0df'];
+    const renderedCharts = ['districtChart', 'genderChart', 'subjectChart', 'mediumChart', 'revenueChart', 'categoryChart', 'religionChart', 'employmentChart'];
+    let cachedData = null;
 
     async function init() {
-        const res = await fetch('/api/data?limit=20000');
-        const data = await res.json();
-        
-        // Update KPIs
-        document.getElementById('kpi-apps').innerText = data.length;
-        document.getElementById('kpi-revenue').innerText = "₹" + data.reduce((s, x) => s + (parseFloat(x.fee_paid_amount) || 0), 0).toLocaleString();
-        document.getElementById('kpi-rejects').innerText = data.filter(x => x.ao_status_label === 'Reject').length;
-        document.getElementById('kpi-geo').innerText = [...new Set(data.map(x => x.district_name))].length;
+        try {
+            const res = await fetch('/api/data?limit=20000');
+            cachedData = await res.json();
+            
+            document.getElementById('kpi-apps').innerText = cachedData.length.toLocaleString();
+            document.getElementById('kpi-revenue').innerText = "₹" + cachedData.reduce((s, x) => s + (parseFloat(x.fee_paid_amount) || 0), 0).toLocaleString();
+            document.getElementById('kpi-rejects').innerText = cachedData.filter(x => x.ao_status_label === 'Reject').length.toLocaleString();
+            document.getElementById('kpi-geo').innerText = [...new Set(cachedData.map(x => x.district_name))].length;
 
-        render(data);
+            render(cachedData);
+        } catch (error) {
+            console.error("Dashboard core loop error:", error);
+            document.getElementById('kpi-apps').innerText = "0";
+            document.getElementById('kpi-revenue').innerText = "₹0";
+            document.getElementById('kpi-rejects').innerText = "0";
+            document.getElementById('kpi-geo').innerText = "0";
+        }
     }
 
     function count(data, key) {
@@ -203,49 +330,77 @@
     }
 
     function render(data) {
-        // District Bar
+        if (!data || data.length === 0) return;
+
+        // 1. District
         const d = count(data, 'district_name');
-        Plotly.newPlot('districtChart', [{ x: Object.keys(d), y: Object.values(d), type: 'bar', marker: { color: '#58a6ff' } }], chartConfig);
+        Plotly.newPlot('districtChart', [{ x: Object.keys(d), y: Object.values(d), type: 'bar', marker: { color: '#00f0ff' } }], chartConfig);
 
-        // Gender Pie
+        // 2. Gender
         const g = count(data, 'gender_label');
-        Plotly.newPlot('genderChart', [{ labels: Object.keys(g), values: Object.values(g), type: 'pie', hole: 0.6 }], chartConfig);
+        Plotly.newPlot('genderChart', [{ labels: Object.keys(g), values: Object.values(g), type: 'pie', hole: 0.55, marker: {colors: ['#00f0ff', '#ff4560']} }], chartConfig);
 
-        // Academic Charts
+        // 3. Subjects
         const s = count(data, 'subject_name');
-        Plotly.newPlot('subjectChart', [{ x: Object.values(s), y: Object.keys(s), type: 'bar', orientation: 'h', marker: { color: '#3fb950' } }], { ...chartConfig, margin: { l: 150 } });
+        Plotly.newPlot('subjectChart', [{ x: Object.values(s), y: Object.keys(s), type: 'bar', orientation: 'h', marker: { color: '#00ff88' } }], { ...chartConfig, margin: { l: 110, t: 20, b: 40, r: 15 } });
 
+        // 4. Mediums
         const m = count(data, 'medium_label');
-        Plotly.newPlot('mediumChart', [{ labels: Object.keys(m), values: Object.values(m), type: 'pie' }], chartConfig);
+        Plotly.newPlot('mediumChart', [{ labels: Object.keys(m), values: Object.values(m), type: 'pie', hole: 0.4, marker: {colors: ['#cc66ff', '#0df']} }], chartConfig);
 
-        // Financial Pipeline
+        // 5. Financial Markers
         Plotly.newPlot('revenueChart', [{
-            x: data.map(x => x.student_name),
-            y: data.map(x => x.fee_paid_amount),
-            mode: 'markers', marker: { size: 10, color: '#bc8cff' }
+            x: data.map(x => x.student_name), y: data.map(x => x.fee_paid_amount),
+            mode: 'markers', marker: { size: 9, color: '#cc66ff', opacity: 0.6 }
         }], chartConfig);
 
-        // Social Categories
+        // 6. Social Categories
         const cat = count(data, 'category_label');
-        Plotly.newPlot('categoryChart', [{ labels: Object.keys(cat), values: Object.values(cat), type: 'pie', hole: 0.4 }], chartConfig);
+        Plotly.newPlot('categoryChart', [{ labels: Object.keys(cat), values: Object.values(cat), type: 'pie', hole: 0.4, marker: {colors: palette} }], chartConfig);
         
+        // 7. Religion Insights
         const rel = count(data, 'religion_label');
-        Plotly.newPlot('religionChart', [{ labels: Object.keys(rel), values: Object.values(rel), type: 'pie' }], chartConfig);
+        Plotly.newPlot('religionChart', [{ labels: Object.keys(rel), values: Object.values(rel), type: 'pie', marker: {colors: palette} }], chartConfig);
 
+        // 8. Employment Profile
         const emp = count(data, 'employment_status_label');
-        Plotly.newPlot('employmentChart', [{ x: Object.keys(emp), y: Object.values(emp), type: 'bar', marker: { color: '#d29922' } }], chartConfig);
+        Plotly.newPlot('employmentChart', [{ x: Object.keys(emp), y: Object.values(emp), type: 'bar', marker: { color: '#ffaa00' } }], chartConfig);
 
-        // Master Table
+        // Populate Table
         document.getElementById('masterTableBody').innerHTML = data.map(r => `
             <tr>
-                <td class="text-info font-monospace">${r.enrollment}</td>
-                <td>${r.student_name}</td>
-                <td>${r.district_name}</td>
-                <td><small>${r.subject_name}</small></td>
-                <td><span class="status-badge ${r.ao_status_label === 'Reject' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'}">${r.ao_status_label || 'Pending'}</span></td>
+                <td class="text-info font-monospace small px-3">${r.enrollment}</td>
+                <td class="fw-semibold text-white">${r.student_name}</td>
+                <td><span class="badge bg-dark border border-secondary text-secondary-emphasis">${r.district_name}</span></td>
+                <td><small class="text-secondary">${r.subject_name}</small></td>
+                <td class="px-3">
+                    <span class="status-badge ${r.ao_status_label === 'Reject' ? 'bg-danger-subtle text-danger border border-danger' : 'bg-success-subtle text-success border border-success'}">
+                        ${r.ao_status_label || 'Approved'}
+                    </span>
+                </td>
             </tr>
         `).join('');
     }
+
+    // INTERCEPT BOOTSTRAP TAB TRANSITIONS: Forced rendering calculations prevent layout collapse on small panels
+    document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', () => {
+            renderedCharts.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.clientWidth > 0) {
+                    Plotly.Plots.resize(el);
+                }
+            });
+        });
+    });
+
+    // GLOBAL RESIZE LISTENER FOR ALL DEVICES (Mobiles up to Projector Displays)
+    window.addEventListener('resize', () => {
+        renderedCharts.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.clientWidth > 0) Plotly.Plots.resize(el);
+        });
+    });
 
     function filterTable() {
         const q = document.getElementById('tableSearch').value.toUpperCase();
