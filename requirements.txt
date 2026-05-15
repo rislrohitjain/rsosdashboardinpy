@@ -1,16 +1,10 @@
-# Web Framework & Visualization
 flask
 plotly
-
-# Polars & Excel Processing
 polars==1.0.0
 fastexcel>=0.10.0
 xlsxwriter
-
-# Database Drivers & Connection (SQLAlchemy + PyMySQL)
 sqlalchemy>=2.0.0
 PyMySQL>=1.1.0
 cryptography>=42.0.0
-
-# Environment Configuration
 python-dotenv>=1.0.0
+gunicorn
