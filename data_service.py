@@ -50,3 +50,46 @@ def get_student_data(limit=10000):
     except Exception as e:
         print(f"--- ❌ SYSTEM ERROR: {str(e)} ---")
         return []
+        
+def get_student_data_excel(limit=10000):
+    # Target the static folder explicitly
+    file_name = "sample_for_dashboard.xlsx"
+    file_path = os.path.join("static", file_name)
+    
+    print(f"--- 📍 Current Working Directory: {os.getcwd()} ---")
+    
+    
+    print(f"--- 🛰️  Looking for local file at: {file_path} ---")
+    
+    # Check if file exists
+    if not os.path.exists(file_path):
+        print(f"--- ❌ SYSTEM ERROR: File not found at {file_path} ---")
+        return []
+        
+    try:
+        # 1. Force the 'calamine' engine which is highly compatible with diverse .xlsx styles
+        # 2. Explicitly read the first sheet (read_excel reads sheet 1 by default, but this is safer)
+        # df = pl.read_excel(file_path, engine="calamine")
+        df = pl.read_excel(file_path, engine="openpyxl")
+        
+        print(f"--- 📥 Total rows loaded from Excel: {df.height} ---")
+
+        if df.height == 0:
+            print("--- ⚠️  WARNING: Excel file was read, but it contains 0 rows of data. ---")
+            return []
+
+        # Respect the limit parameter if data exceeds it
+        if limit and df.height > limit:
+            df = df.head(limit)
+            print(f"--- ✂️  Sliced dataset to first {limit} rows ---")
+
+        print(f"--- ⚡ Polars processing {df.height} records ---")
+        
+        return df.to_dicts()
+
+    except Exception as e:
+        # This will now print the EXACT error traceback/message instead of a generic failure
+        import traceback
+        print(f"--- ❌ SYSTEM ERROR: {str(e)} ---")
+        traceback.print_exc()
+        return []
