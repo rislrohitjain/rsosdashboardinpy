@@ -13,6 +13,18 @@
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
     
     <style>
+		.sample-trigger-link {
+			font-size: 0.825rem;
+			color: var(--accent-cyan);
+			text-decoration: none;
+			opacity: 0.75;
+			transition: all 0.2s ease-in-out;
+		}
+		.sample-trigger-link:hover {
+			opacity: 1;
+			text-shadow: 0 0 8px var(--accent-cyan);
+		}
+
         :root { 
             --bg-main: #0a0e14;
             --bg-card: rgba(21, 28, 38, 0.7);
@@ -113,6 +125,12 @@
                     <button class="btn btn-outline-info btn-sm rounded-pill px-3 flex-grow-1" onclick="loadDashboard()">🔄 Refresh</button>
                     <a href="/dashboard2" class="btn btn-info btn-sm rounded-pill px-3 text-dark fw-semibold flex-grow-1" style="background-color: var(--accent-cyan);">🚀 Executive View</a>
                 </div>
+				
+				<!-- NEW CODE: Quick Sample Trigger Link -->
+				<div class="text-center text-md-end mt-2">
+					<a href="#" class="sample-trigger-link" onclick="loadSampleRecords(event, 551)">✨ Load 551 sample records</a>
+				</div>
+	
             </div>
         </div>
     </div>
@@ -395,6 +413,38 @@
             document.getElementById('frontend-time').innerText = `${loadTimeLegacy.toFixed(4)} seconds`;
         }
     });
+	
+	// Add this helper function below loadDashboard()
+	async function loadSampleRecords(event, customLimit) {
+		event.preventDefault(); // Stop the default page jump behavior
+		
+		// Show loader overlay smoothly while fetching
+		const loader = document.getElementById('loader-wrapper');
+		loader.style.display = 'flex';
+		loader.style.opacity = '1';
+
+		try {
+			// Fetch the modified limit explicitly from your API
+			const response = await fetch(`/api/data?limit=${customLimit}`);
+			const data = await response.json();
+			
+			// Re-push fresh metrics downstream through your rendering architecture
+			updateKPIs(data);
+			renderCharts(data);
+			renderTable(data);
+			
+			document.getElementById('perf-time').innerText = Math.round(performance.now() - startTime) + "ms";
+		} catch (error) {
+			console.error("Failed fetching sample set records:", error);
+		} finally {
+			// Fade loader back out out smoothly
+			setTimeout(() => {
+				loader.style.opacity = '0';
+				setTimeout(() => loader.style.display = 'none', 600);
+			}, 400);
+		}
+	}
+
 </script>
 
 
